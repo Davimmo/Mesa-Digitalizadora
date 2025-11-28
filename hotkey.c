@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <stdio.h>
 
 void sendKeyCombo(WORD modifier1, WORD modifier2, WORD key) {
     INPUT input[6] = {0};
@@ -34,17 +33,32 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     MSG msg;
     int toggle = 0;
 
+    // Hotkey 1: Ctrl + Alt + 9 (alternar A / D)
     RegisterHotKey(NULL, 1, MOD_CONTROL | MOD_ALT, '9');
 
-    while (GetMessage(&msg, NULL, 0, 0)) {
-        if (msg.message == WM_HOTKEY && msg.wParam == 1) {
+    // Hotkey 2: Ctrl + Shift + 9 (sair do programa)
+    RegisterHotKey(NULL, 2, MOD_CONTROL | MOD_SHIFT, '9');
 
-            if (toggle == 0) {
-                sendKeyCombo(VK_CONTROL, VK_SHIFT, 'A');
-                toggle = 1;
-            } else {
-                sendKeyCombo(VK_CONTROL, VK_SHIFT, 'D');
-                toggle = 0;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        if (msg.message == WM_HOTKEY) {
+
+            // Hotkey principal
+            if (msg.wParam == 1) {
+                if (toggle == 0) {
+                    sendKeyCombo(VK_CONTROL, VK_SHIFT, 'A');
+                    toggle = 1;
+                } else {
+                    sendKeyCombo(VK_CONTROL, VK_SHIFT, 'D');
+                    toggle = 0;
+                }
+            }
+
+            // Hotkey de saída: Ctrl + Shift + 9
+            if (msg.wParam == 2) {
+                // Desregistrar hotkeys antes de sair
+                UnregisterHotKey(NULL, 1);
+                UnregisterHotKey(NULL, 2);
+                ExitProcess(0);
             }
         }
     }
